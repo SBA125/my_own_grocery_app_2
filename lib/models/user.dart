@@ -1,35 +1,32 @@
 class User {
-  final String id;
-  final String name;
+  final String userID;
+  final String username;
   final String email;
-  final String password;
-  // Add more fields as needed
+  final String role;
+  // Add other user details as needed
 
   User({
-    required this.id,
-    required this.name,
+    required this.userID,
+    required this.username,
     required this.email,
-    required this.password,
-    // Add more fields as needed
+    required this.role,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
+  factory User.fromMap(Map<String, dynamic> data) {
     return User(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        email: json['email'] as String,
-        password: json['password'] as String
-        // Add more fields as needed
-        );
+      userID: data['userID'],
+      username: data['username'],
+      email: data['email'],
+      role: data['role'],
+    );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'name': name,
+      'userID': userID,
+      'username': username,
       'email': email,
-      'password': password,
-      // Add more fields as needed
+      'role': role,
     };
   }
 }

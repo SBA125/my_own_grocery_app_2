@@ -1,10 +1,12 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_own_grocery_app_2/screens/home/home_screen.dart';
 import '../../blocs/authentication/authentication_bloc.dart';
 import '../../blocs/authentication/authentication_event.dart';
 import '../../blocs/authentication/authentication_state.dart';
 import '../../repositories/authentication_repository.dart';
+import '../../services/firebase_auth_service.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
@@ -12,17 +14,17 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthenticationBloc>(
-          create: (_) => AuthenticationBloc(authenticationRepository),
-        ),
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Login'),
-        ),
-        body: const Padding(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+      ),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>(
+            create: (_) => AuthenticationBloc(authenticationRepository),
+          ),
+        ],
+        child: const Padding(
           padding: EdgeInsets.all(16.0),
           child: LoginForm(),
         ),
@@ -35,14 +37,13 @@ class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   @override
-  _LoginFormState createState() => _LoginFormState();
+  LoginFormState createState() => LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -64,8 +65,11 @@ class _LoginFormState extends State<LoginForm> {
               const SnackBar(content: Text('Logging in...')),
             );
           } else if (state is AuthenticationAuthenticated) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(authenticationRepository:
+            AuthenticationRepository(
+                FirebaseAuthService()),)));
             // Navigate to home screen or perform other actions
-            Navigator.of(context).pushReplacementNamed('/register_screen');
+            // Navigator.of(context).pushReplacementNamed('/register_screen');
           } else if (state is AuthenticationError) {
             // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
@@ -111,10 +115,6 @@ class _LoginFormState extends State<LoginForm> {
                       password: _passwordController.text,
                     ),
                   );
-                  // _auth.signInWithEmailAndPassword(
-                  //     email: _emailController.text,
-                  //     password: _passwordController.text);
-                  // print('HELOOOOOOOOOOOO');
                 }
               },
               child: const Text('Login'),

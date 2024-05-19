@@ -1,35 +1,40 @@
-import 'product.dart';
-
 class Order {
-  final String id;
-  final List<Product> products;
-  final double totalAmount;
-  // Add more fields as needed
+  final String orderID;
+  final String userID;
+  final List<Map<String, dynamic>> products; // List of product IDs and quantities
+  final double totalPrice;
+  final String orderStatus;
+  final String paymentMethod;
+  // Add other order details as needed
 
   Order({
-    required this.id,
+    required this.orderID,
+    required this.userID,
     required this.products,
-    required this.totalAmount,
-    // Add more fields as needed
+    required this.totalPrice,
+    required this.orderStatus,
+    required this.paymentMethod,
   });
 
-  factory Order.fromJson(Map<String, dynamic> json) {
+  factory Order.fromMap(Map<String, dynamic> data) {
     return Order(
-      id: json['id'] as String,
-      products: (json['products'] as List<dynamic>)
-          .map((productJson) => Product.fromJson(productJson))
-          .toList(),
-      totalAmount: (json['totalAmount'] as num).toDouble(),
-      // Add more fields as needed
+      orderID: data['orderID'],
+      userID: data['userID'],
+      products: List<Map<String, dynamic>>.from(data['products']),
+      totalPrice: data['totalPrice'],
+      orderStatus: data['orderStatus'],
+      paymentMethod: data['paymentMethod'],
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'products': products.map((product) => product.toJson()).toList(),
-      'totalAmount': totalAmount,
-      // Add more fields as needed
+      'orderID': orderID,
+      'userID': userID,
+      'products': products,
+      'totalPrice': totalPrice,
+      'orderStatus': orderStatus,
+      'paymentMethod': paymentMethod,
     };
   }
 }

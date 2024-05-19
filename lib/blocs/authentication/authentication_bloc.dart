@@ -14,49 +14,49 @@ class AuthenticationBloc
     on<AuthenticationSignOutRequested>(_mapSignOutRequestedToState);
   }
 
-  Stream<AuthenticationState> _mapSignInRequestedToState(
+  Future<void> _mapSignInRequestedToState(
       AuthenticationSignInRequested event,
-      Emitter<AuthenticationState> emit) async* {
-    yield AuthenticationLoading();
+      Emitter<AuthenticationState> emit) async {
+    emit(AuthenticationLoading());
     try {
       final user = await _authenticationRepository.signInWithEmailAndPassword(
           event.email, event.password);
       if (user != null) {
-        yield AuthenticationAuthenticated(user); // Emit authenticated state
+        emit(AuthenticationAuthenticated(user)); // Emit authenticated state
       } else {
-        yield const AuthenticationError('Sign-in failed'); // Emit error state
+        emit(const AuthenticationError('Sign-in failed')); // Emit error state
       }
     } catch (e) {
-      yield AuthenticationError('Sign-in failed: $e'); // Emit error state
+      emit(AuthenticationError('Sign-in failed: $e')); // Emit error state
     }
   }
 
-  Stream<AuthenticationState> _mapSignUpRequestedToState(
+  Future<void> _mapSignUpRequestedToState(
       AuthenticationSignUpRequested event,
-      Emitter<AuthenticationState> emit) async* {
-    yield AuthenticationLoading();
+      Emitter<AuthenticationState> emit) async {
+    emit(AuthenticationLoading());
     try {
       final user = await _authenticationRepository.signUpWithEmailAndPassword(
           event.email, event.password);
       if (user != null) {
-        yield AuthenticationAuthenticated(user); // Emit authenticated state
+        emit(AuthenticationAuthenticated(user)); // Emit authenticated state
       } else {
-        yield const AuthenticationError('Sign-up failed'); // Emit error state
+        emit(const AuthenticationError('Sign-up failed')); // Emit error state
       }
     } catch (e) {
-      yield AuthenticationError('Sign-up failed: $e'); // Emit error state
+      emit(AuthenticationError('Sign-up failed: $e')); // Emit error state
     }
   }
 
-  Stream<AuthenticationState> _mapSignOutRequestedToState(
+  Future<void> _mapSignOutRequestedToState(
       AuthenticationSignOutRequested event,
-      Emitter<AuthenticationState> emit) async* {
-    yield AuthenticationLoading();
+      Emitter<AuthenticationState> emit) async {
+    emit(AuthenticationLoading());
     try {
       await _authenticationRepository.signOut();
-      yield AuthenticationUnauthenticated(); // Emit unauthenticated state
+      emit(AuthenticationUnauthenticated()); // Emit unauthenticated state
     } catch (e) {
-      yield AuthenticationError('Sign-out failed: $e'); // Emit error state
+      emit(AuthenticationError('Sign-out failed: $e')); // Emit error state
     }
   }
 }

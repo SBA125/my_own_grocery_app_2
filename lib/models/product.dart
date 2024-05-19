@@ -1,38 +1,36 @@
-// models/product.dart
-import 'category.dart'; // Import the Category class if not already imported
-
 class Product {
-  final String id;
+  final String productID;
   final String name;
+  final String description;
   final double price;
-  final Category category;
-  final String imageUrl; // Add an image property
+  final String categoryID; // Reference to Categories collection
+  // Add other product details as needed
 
   Product({
-    required this.id,
+    required this.productID,
     required this.name,
+    required this.description,
     required this.price,
-    required this.category,
-    required this.imageUrl, // Include imageUrl in the constructor
+    required this.categoryID,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
+  factory Product.fromMap(Map<String, dynamic> data) {
     return Product(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      price: (json['price'] as num).toDouble(),
-      category: Category.fromJson(json['category']),
-      imageUrl: json['imageUrl'] as String, // Parse imageUrl from JSON
+      productID: data['productID'],
+      name: data['name'],
+      description: data['description'],
+      price: data['price'],
+      categoryID: data['categoryID'],
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'productID': productID,
       'name': name,
+      'description': description,
       'price': price,
-      'category': category.toJson(),
-      'imageUrl': imageUrl, // Include imageUrl in the JSON representation
+      'categoryID': categoryID,
     };
   }
 }

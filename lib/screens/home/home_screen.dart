@@ -1,33 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_own_grocery_app_2/blocs/authentication/authentication_event.dart';
+import 'package:my_own_grocery_app_2/repositories/authentication_repository.dart';
+import 'package:my_own_grocery_app_2/widgets/side_drawer.dart';
+import 'package:my_own_grocery_app_2/widgets/text_form_field.dart';
+import '../../blocs/authentication/authentication_bloc.dart';
+import '../../blocs/authentication/authentication_state.dart';
+import '../../blocs/categories/category_bloc.dart';
+import '../../blocs/categories/category_state.dart';
+import '../../main.dart';
+import '../../models/category.dart';
+import '../category_screen/category_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final AuthenticationRepository authenticationRepository;
+
+  const HomeScreen({super.key, required this.authenticationRepository});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        leading: Builder(
+          builder: (context) => IconButton(onPressed: ()=> Scaffold.of(context).openDrawer(), icon: const Icon(Icons.menu))
+        ),
+        centerTitle: true,
+        title: Column(
           children: [
-            const Text(
-              'Welcome to the Home Screen!',
-              style: TextStyle(fontSize: 24),
-              textAlign: TextAlign.center,
+            Text(
+              'Pickup',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Add logout logic here
-              },
-              child: const Text('Logout'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Location 1',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_drop_down),
+              ],
             ),
           ],
+        ),
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: const Badge(
+                  isLabelVisible: true,
+                  label: Text('2'),
+                  child: Icon(Icons.shopping_cart)))
+        ],
+        bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(60),
+            child: SearchTextFormField(),
+        ),
+      ),
+      drawer: const SideDrawer(),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/pictures/96.jpg'),
+            fit: BoxFit.cover
+          ),
+        ),
+        child: BlocListener<AuthenticationBloc, AuthenticationState>(
+          listener: (context, state) {
+            if (state is AuthenticationUnauthenticated) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const MainScreen()));
+            }
+          },
+          child: const Padding(
+            padding:  EdgeInsets.all(16.0),
+            child: CategoryList(),
+          ),
         ),
       ),
     );
   }
 }
+
+
+
+
+

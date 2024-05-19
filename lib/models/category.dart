@@ -1,35 +1,36 @@
-// models/category.dart
-import 'product.dart'; // Import the Product class
-
 class Category {
+  final String categoryID;
   final String name;
-  final List<Product> products; // List of products
+  final String description;
+  final String imageUrl;
+  final List<String> productIDs; // List of product IDs associated with this category
 
   Category({
+    required this.categoryID,
     required this.name,
-    required this.products,
+    required this.description,
+    required this.imageUrl,
+    required this.productIDs,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    // Parse products from JSON
-    List<Product> products = (json['products'] as List<dynamic>)
-        .map((productJson) => Product.fromJson(productJson))
-        .toList();
-
+  factory Category.fromMap(Map<String, dynamic> data) {
     return Category(
-      name: json['name'] as String,
-      products: products,
+      categoryID: data['categoryID'],
+      name: data['name'],
+      description: data['description'],
+      imageUrl:data['imageUrl'],
+      productIDs: List<String>.from(data['productIDs']) ,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    // Convert products to JSON
-    List<Map<String, dynamic>> productsJson =
-        products.map((product) => product.toJson()).toList();
-
+  Map<String, dynamic> toMap() {
     return {
+      'categoryID': categoryID,
       'name': name,
-      'products': productsJson,
+      'description': description,
+      'imageUrl': imageUrl,
+      'productIDs': productIDs,
     };
   }
 }
+
