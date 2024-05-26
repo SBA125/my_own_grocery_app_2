@@ -7,12 +7,21 @@ class AuthenticationRepository {
 
   AuthenticationRepository(this._authService);
 
+  Future<User?> signInWithGoogle() async {
+    try {
+      return await _authService.signInWithGoogle();
+    } catch (e) {
+      print("Error signing in with Google: $e");
+      return null;
+    }
+  }
+
   Future<User?> signInWithEmailAndPassword(String email, String password) {
     return _authService.signInWithEmailAndPassword(email, password);
   }
 
-  Future<User?> signUpWithEmailAndPassword(String email, String password) {
-    return _authService.signUpWithEmailAndPassword(email, password);
+  Future<User?> signUpWithEmailAndPassword(String email, String password, String username) {
+    return _authService.signUpWithEmailAndPassword(email, password, username);
   }
 
   Future<void> signOut() {

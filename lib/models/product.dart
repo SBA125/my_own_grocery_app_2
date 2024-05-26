@@ -1,26 +1,33 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Product {
   final String productID;
   final String name;
   final String description;
-  final double price;
-  final String categoryID; // Reference to Categories collection
-  // Add other product details as needed
+  final int price;
+  final String imageUrl;
+  final int quantity;
+  final bool inStock;
 
   Product({
     required this.productID,
     required this.name,
     required this.description,
     required this.price,
-    required this.categoryID,
+    required this.imageUrl,
+    required this.quantity,
+    required this.inStock,
   });
 
   factory Product.fromMap(Map<String, dynamic> data) {
     return Product(
-      productID: data['productID'],
-      name: data['name'],
-      description: data['description'],
-      price: data['price'],
-      categoryID: data['categoryID'],
+      productID: data['productID'] ?? '',
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      price: data['price'] ?? 0, // Handle null by providing a default value
+      imageUrl: data['imageUrl'] ?? '',
+      quantity: data['quantity'] ?? 0, // Handle null by providing a default value
+      inStock: data['inStock'] ?? false,
     );
   }
 
@@ -30,7 +37,23 @@ class Product {
       'name': name,
       'description': description,
       'price': price,
-      'categoryID': categoryID,
+      'imageUrl': imageUrl,
+      'quantity': quantity,
+      'inStock': inStock,
     };
   }
+
+  factory Product.fromSnapshot(DocumentSnapshot snapshot) {
+    final data = snapshot.data() as Map<String, dynamic>;
+    return Product(
+      productID: snapshot.id,
+      name: data['name'],
+      description: data['description'],
+      price: data['price'],
+      imageUrl: data['imageUrl'],
+      quantity: data['quantity'],
+      inStock: data['inStock'],
+    );
+  }
+
 }

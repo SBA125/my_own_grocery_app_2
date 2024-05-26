@@ -24,9 +24,10 @@ class AuthenticationSignInRequested extends AuthenticationEvent {
 class AuthenticationSignUpRequested extends AuthenticationEvent {
   final String email;
   final String password;
+  final String username;
 
   const AuthenticationSignUpRequested(
-      {required this.email, required this.password});
+      {required this.email, required this.password, required this.username});
 
   @override
   List<Object> get props => [email, password];

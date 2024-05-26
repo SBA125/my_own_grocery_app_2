@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:my_own_grocery_app_2/blocs/products/product_bloc.dart';
+import 'package:my_own_grocery_app_2/blocs/users/user_bloc.dart';
 import 'package:my_own_grocery_app_2/repositories/category_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/product_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
 import 'package:my_own_grocery_app_2/services/firebase_auth_service.dart';
 import 'package:my_own_grocery_app_2/services/firebase_category_service.dart';
+import 'package:my_own_grocery_app_2/services/firebase_product_service.dart';
+import 'package:my_own_grocery_app_2/services/firebase_user_service.dart';
 import 'blocs/categories/category_bloc.dart';
 import 'blocs/categories/category_event.dart';
 import 'firebase_options.dart';
@@ -21,47 +27,56 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Create the AuthenticationRepository instance
   final AuthenticationRepository authenticationRepository = AuthenticationRepository(FirebaseAuthService());
   final CategoryRepository categoryRepository = CategoryRepository(firebaseCategoryService: FirebaseCategoryService());
+  final ProductRepository productRepository = ProductRepository(firebaseProductService: FirebaseProductService());
+  final UserRepository userRepository = UserRepository(firebaseUserService: FirebaseUserService());
 
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider<AuthenticationBloc>(
-          create: (_) => AuthenticationBloc(authenticationRepository),
+          create: (_) => AuthenticationBloc(authenticationRepository, userRepository),
+        ),
+        BlocProvider<CategoryBloc>(
+          create: (_) => CategoryBloc(categoryRepository: categoryRepository)..add(LoadCategories()),
+        ),
+        BlocProvider<ProductBloc>(
+            create: (_) => ProductBloc(productRepository: productRepository)
         ),
         BlocProvider(
-          create: (context) => CategoryBloc(categoryRepository: categoryRepository)..add(LoadCategories()),
+            create: (_) => UserBloc(userRepository: userRepository)
         ),
       ],
-      child: MyApp(authenticationRepository: authenticationRepository),
+      child: MyApp(authenticationRepository: authenticationRepository, userRepository: userRepository,),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
+  final UserRepository userRepository;
 
-  const MyApp({super.key, required this.authenticationRepository});
+  const MyApp({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Grocery App',
-      home: const MainScreen(),
-      initialRoute: '/home',
+      home: MainScreen(authenticationRepository: authenticationRepository),
+      initialRoute: '/',
       routes: {
-        '/register': (context) => const RegisterScreen(),
-        '/login': (context) => LoginScreen(authenticationRepository: authenticationRepository),
-        '/home': (context) => HomeScreen(authenticationRepository: authenticationRepository,),
+        '/register': (context) => RegisterScreen(authenticationRepository: authenticationRepository, userRepository: userRepository),
+        '/login': (context) => LoginScreen(authenticationRepository: authenticationRepository, userRepository: userRepository),
+        '/home': (context) => HomeScreen(authenticationRepository: authenticationRepository, userRepository: userRepository),
       },
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final AuthenticationRepository authenticationRepository;
+  const MainScreen({super.key, required this.authenticationRepository});
 
   @override
   MainScreenState createState() => MainScreenState();
@@ -125,7 +140,6 @@ class MainScreenState extends State<MainScreen> {
                     width: 250,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigate to login screen
                         Navigator.pushNamed(context, '/login');
                       },
                       child: const Text(
@@ -138,7 +152,12 @@ class MainScreenState extends State<MainScreen> {
                   SizedBox(
                     width: 250,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                       await widget.authenticationRepository.signInWithGoogle();
+                       if (mounted) {
+                         Navigator.pushNamed(context, '/home');
+                       }
+                      },
                       child: const Text(
                         'Login With Gmail',
                         style: TextStyle(fontWeight: FontWeight.bold),

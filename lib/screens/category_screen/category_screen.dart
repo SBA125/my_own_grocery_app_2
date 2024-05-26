@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_own_grocery_app_2/screens/products/product_screen.dart';
 import '../../blocs/categories/category_bloc.dart';
 import '../../blocs/categories/category_state.dart';
 import '../../models/category.dart';
@@ -20,12 +21,15 @@ class CategoryList extends StatelessWidget {
               crossAxisCount: 2,
               childAspectRatio: 0.8,
               crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+              mainAxisSpacing: 15,
             ),
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final category = categories[index];
-              return CategoryCard(category: category);
+              return InkWell(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>  ProductScreen(category: category))),
+                  child: CategoryCard(category: category),
+              );
             },
           );
         } else if (state is CategoryError) {
@@ -58,12 +62,12 @@ class CategoryCard extends StatelessWidget {
               child: Image.network(
                 category.imageUrl,
                 fit: BoxFit.cover,
-                width: double.infinity,
+                // width: double.infinity,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
             child: Text(
               category.name,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),

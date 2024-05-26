@@ -1,16 +1,17 @@
-// import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
 import 'package:my_own_grocery_app_2/screens/home/home_screen.dart';
 import '../../blocs/authentication/authentication_bloc.dart';
 import '../../blocs/authentication/authentication_event.dart';
 import '../../blocs/authentication/authentication_state.dart';
 import '../../repositories/authentication_repository.dart';
-import '../../services/firebase_auth_service.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
-  const LoginScreen({super.key, required this.authenticationRepository});
+  final UserRepository userRepository;
+  const LoginScreen({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +19,23 @@ class LoginScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthenticationBloc>(
-            create: (_) => AuthenticationBloc(authenticationRepository),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/pictures/96.jpg'),
+              fit: BoxFit.cover
           ),
-        ],
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: LoginForm(),
+        ),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>(
+              create: (_) => AuthenticationBloc(authenticationRepository, userRepository),
+            ),
+          ],
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: LoginForm(authenticationRepository: authenticationRepository, userRepository: userRepository),
+          ),
         ),
       ),
     );
@@ -34,7 +43,9 @@ class LoginScreen extends StatelessWidget {
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+  final AuthenticationRepository authenticationRepository;
+  final UserRepository userRepository;
+  const LoginForm({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
   LoginFormState createState() => LoginFormState();
@@ -65,9 +76,14 @@ class LoginFormState extends State<LoginForm> {
               const SnackBar(content: Text('Logging in...')),
             );
           } else if (state is AuthenticationAuthenticated) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(authenticationRepository:
-            AuthenticationRepository(
-                FirebaseAuthService()),)));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen(
+                authenticationRepository: widget.authenticationRepository,
+                userRepository: widget.userRepository,
+              )
+              ),
+            );
             // Navigate to home screen or perform other actions
             // Navigator.of(context).pushReplacementNamed('/register_screen');
           } else if (state is AuthenticationError) {
@@ -82,7 +98,7 @@ class LoginFormState extends State<LoginForm> {
           children: [
             TextFormField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Email', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your email';
@@ -94,7 +110,7 @@ class LoginFormState extends State<LoginForm> {
             const SizedBox(height: 16.0),
             TextFormField(
               controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Password', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               obscureText: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {

@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import '../../repositories/category_repository.dart';
 import 'category_event.dart';
 import 'category_state.dart';

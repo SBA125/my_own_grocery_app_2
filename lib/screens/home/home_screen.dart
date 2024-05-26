@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_own_grocery_app_2/blocs/authentication/authentication_event.dart';
 import 'package:my_own_grocery_app_2/repositories/authentication_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
 import 'package:my_own_grocery_app_2/widgets/side_drawer.dart';
 import 'package:my_own_grocery_app_2/widgets/text_form_field.dart';
 import '../../blocs/authentication/authentication_bloc.dart';
@@ -14,8 +15,9 @@ import '../category_screen/category_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
+  final UserRepository userRepository;
 
-  const HomeScreen({super.key, required this.authenticationRepository});
+  const HomeScreen({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {},
               icon: const Badge(
                   isLabelVisible: true,
-                  label: Text('2'),
+                  label: Text(''),
                   child: Icon(Icons.shopping_cart)))
         ],
         bottom: const PreferredSize(
@@ -63,23 +65,33 @@ class HomeScreen extends StatelessWidget {
             child: SearchTextFormField(),
         ),
       ),
-      drawer: const SideDrawer(),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/pictures/96.jpg'),
-            fit: BoxFit.cover
+      drawer: SideDrawer(authenticationRepository: authenticationRepository, userRepository: userRepository),
+      body: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>(
+            create: (_) => AuthenticationBloc(authenticationRepository, userRepository),
           ),
-        ),
-        child: BlocListener<AuthenticationBloc, AuthenticationState>(
-          listener: (context, state) {
-            if (state is AuthenticationUnauthenticated) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const MainScreen()));
-            }
-          },
-          child: const Padding(
-            padding:  EdgeInsets.all(16.0),
-            child: CategoryList(),
+        ],
+        child: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/pictures/96.jpg'),
+              fit: BoxFit.cover
+            ),
+          ),
+          child: BlocListener<AuthenticationBloc, AuthenticationState>(
+            listener: (context, state) {
+              if (state is AuthenticationUnauthenticated) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MainScreen(authenticationRepository: authenticationRepository)),
+                );
+              }
+            },
+            child: const Padding(
+              padding:  EdgeInsets.all(16.0),
+              child: CategoryList(),
+            ),
           ),
         ),
       ),

@@ -1,6 +1,17 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_own_grocery_app_2/blocs/authentication/authentication_event.dart';
+import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
+import 'package:my_own_grocery_app_2/screens/home/home_screen.dart';
+
+import '../../blocs/authentication/authentication_bloc.dart';
+import '../../blocs/authentication/authentication_state.dart';
+import '../../repositories/authentication_repository.dart';
 class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+  final AuthenticationRepository authenticationRepository;
+  final UserRepository userRepository;
+  const RegisterScreen({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -9,43 +20,88 @@ class RegisterScreen extends StatelessWidget {
         leading: IconButton(onPressed: (){Navigator.pop(context);} , icon: const Icon(Icons.arrow_back)),
         title: const Text('Register'),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: RegisterForm(),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/pictures/96.jpg'),
+              fit: BoxFit.cover
+          ),
+        ),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>(
+              create: (_) => AuthenticationBloc(authenticationRepository, userRepository),
+            ),
+          ],
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: RegisterForm(authenticationRepository: authenticationRepository, userRepository: userRepository,),
+          ),
+        ),
       ),
     );
   }
 }
 
 class RegisterForm extends StatefulWidget {
-  const RegisterForm({super.key});
+  final AuthenticationRepository authenticationRepository;
+  final UserRepository userRepository;
+  const RegisterForm({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
-  _RegisterFormState createState() => _RegisterFormState();
+  RegisterFormState createState() => RegisterFormState();
 }
 
-class _RegisterFormState extends State<RegisterForm> {
+class RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    String name = '';
+    String email = '';
+    String password = '';
     return Form(
       key: _formKey,
-      child: Column(
+      child: BlocListener<AuthenticationBloc, AuthenticationState>(
+        listener: (context, state) {
+          if (state is AuthenticationLoading) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Loading...')),
+            );
+          } else if (state is AuthenticationAuthenticated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Registration successful')),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen(
+                  authenticationRepository: widget.authenticationRepository,
+                  userRepository: widget.userRepository
+              )
+              ),
+            );
+          } else if (state is AuthenticationError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Registration failed: ${state.message}')),
+            );
+          }
+        },
+  child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Name'),
+            decoration: const InputDecoration(labelText: 'Name', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your name';
               }
               return null;
             },
+            onSaved: (value) => name = value!,
           ),
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Email'),
+            decoration: const InputDecoration(labelText: 'Email',labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email';
@@ -53,10 +109,11 @@ class _RegisterFormState extends State<RegisterForm> {
               // Add email validation logic here if needed
               return null;
             },
+            onSaved: (value) => email = value!,
           ),
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: const InputDecoration(labelText: 'Password',labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
             obscureText: true,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -65,10 +122,11 @@ class _RegisterFormState extends State<RegisterForm> {
               // Add password validation logic here if needed
               return null;
             },
+            onSaved: (value) => password = value!,
           ),
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Confirm Password'),
+            decoration: const InputDecoration(labelText: 'Confirm Password', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
             obscureText: true,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -82,7 +140,12 @@ class _RegisterFormState extends State<RegisterForm> {
           ElevatedButton(
             onPressed: () {
               if (_formKey.currentState!.validate()) {
-                // Form is valid, perform registration logic here
+                _formKey.currentState!.save();
+                context.read<AuthenticationBloc>().add(AuthenticationSignUpRequested(
+                  username: name,
+                  email: email,
+                  password: password,
+                ));
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Registration successful')),
                 );
@@ -91,6 +154,7 @@ class _RegisterFormState extends State<RegisterForm> {
             child: const Text('Register'),
           ),
         ],
+      ),
       ),
     );
   }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SearchTextFormField extends StatelessWidget {
-  const SearchTextFormField({
-    super.key,
-  });
+  const SearchTextFormField({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +35,7 @@ class SearchTextFormField extends StatelessWidget {
               filled: true,
               fillColor: Colors.white,
             ),
+            // onFieldSubmitted: Search,
           ),
         ),
       ),
