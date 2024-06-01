@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_own_grocery_app_2/screens/home_screen.dart';
-import '../blocs/cart/cart_bloc.dart';
-import '../blocs/cart/cart_event.dart';
-import '../blocs/cart/cart_state.dart';
-import '../repositories/authentication_repository.dart';
-import '../repositories/user_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/order_repository.dart';
+import 'package:my_own_grocery_app_2/screens/user/home_screen.dart';
+import '../../blocs/cart/cart_bloc.dart';
+import '../../blocs/cart/cart_event.dart';
+import '../../blocs/cart/cart_state.dart';
+import '../../repositories/authentication_repository.dart';
+import '../../repositories/user_repository.dart';
+import 'order_screen.dart';
 
 class CartScreen extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;
-  const CartScreen({super.key, required this.authenticationRepository, required this.userRepository});
+  final OrderRepository orderRepository;
+  const CartScreen({super.key, required this.authenticationRepository, required this.userRepository, required this.orderRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class CartScreen extends StatelessWidget {
           onPressed: (){
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen(userRepository: userRepository , authenticationRepository: authenticationRepository)),
+              MaterialPageRoute(builder: (context) => HomeScreen(userRepository: userRepository , authenticationRepository: authenticationRepository, orderRepository: orderRepository,)),
             );
           },
         ),
@@ -41,7 +44,7 @@ class CartScreen extends StatelessWidget {
                       final cartItem = state.cartItems[index];
                       final totalItemPrice = cartItem.price * cartItem.quantity;
                       return ListTile(
-                        leading: Image.network(cartItem.imageUrl),
+                        leading: Image.network(cartItem.imageUrl, width: 80,),
                         title: Text(
                           cartItem.name,
                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -52,7 +55,7 @@ class CartScreen extends StatelessWidget {
                               icon: const Icon(Icons.remove),
                               splashRadius: 0.1,
                               onPressed: () {
-                                if(cartItem.quantity ==0){
+                                if(cartItem.quantity ==1){
                                   BlocProvider.of<CartBloc>(context).add(RemoveItemFromCart(cartItem.id));
                                 }
                                 // Decrease quantity logic
@@ -114,9 +117,18 @@ class CartScreen extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Place order logic
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => OrderScreen(
+                            orderRepository: orderRepository,
+                            authenticationRepository: authenticationRepository,
+                            userRepository: userRepository,
+                          )
+                      ),
+                    );
                   },
-                  child: const Text('Place Order'),
+                  child: const Text('Checkout'),
                 ),
               ],
             ),

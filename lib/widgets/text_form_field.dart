@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../blocs/products/product_bloc.dart';
+import '../blocs/products/product_event.dart';
 
 class SearchTextFormField extends StatelessWidget {
   const SearchTextFormField({super.key});
@@ -18,7 +22,6 @@ class SearchTextFormField extends StatelessWidget {
           width: 300,
           child: TextFormField(
             decoration: InputDecoration(
-
               hintText: 'Search by product name',
               hintStyle: textTheme.bodyMedium!.copyWith(
                 color: Colors.black,
@@ -35,6 +38,9 @@ class SearchTextFormField extends StatelessWidget {
               filled: true,
               fillColor: Colors.white,
             ),
+            onChanged: (productName) {
+              context.read<ProductBloc>().add(SearchProducts(productName));
+            },
             // onFieldSubmitted: Search,
           ),
         ),

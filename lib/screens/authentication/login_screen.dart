@@ -1,29 +1,30 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_own_grocery_app_2/repositories/order_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
-import 'package:my_own_grocery_app_2/screens/home_screen.dart';
-import '../blocs/authentication/authentication_bloc.dart';
-import '../blocs/authentication/authentication_event.dart';
-import '../blocs/authentication/authentication_state.dart';
-import '../repositories/authentication_repository.dart';
+import 'package:my_own_grocery_app_2/screens/admin/admin_main_screen.dart';
+import 'package:my_own_grocery_app_2/screens/user/home_screen.dart';
+import '../../blocs/authentication/authentication_bloc.dart';
+import '../../blocs/authentication/authentication_event.dart';
+import '../../blocs/authentication/authentication_state.dart';
+import '../../repositories/authentication_repository.dart';
 
 class LoginScreen extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;
-  const LoginScreen({super.key, required this.authenticationRepository, required this.userRepository});
+  final OrderRepository orderRepository;
+  const LoginScreen({super.key, required this.authenticationRepository, required this.userRepository, required this.orderRepository});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+      appBar: AppBar(),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-              image: AssetImage('assets/pictures/96.jpg'),
-              fit: BoxFit.cover
+            image: AssetImage('assets/pictures/96.jpg'),
+            fit: BoxFit.cover,
           ),
         ),
         child: MultiBlocProvider(
@@ -34,7 +35,7 @@ class LoginScreen extends StatelessWidget {
           ],
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: LoginForm(authenticationRepository: authenticationRepository, userRepository: userRepository),
+            child: LoginForm(authenticationRepository: authenticationRepository, userRepository: userRepository, orderRepository: orderRepository,),
           ),
         ),
       ),
@@ -45,7 +46,8 @@ class LoginScreen extends StatelessWidget {
 class LoginForm extends StatefulWidget {
   final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;
-  const LoginForm({super.key, required this.authenticationRepository, required this.userRepository});
+  final OrderRepository orderRepository;
+  const LoginForm({super.key, required this.authenticationRepository, required this.userRepository, required this.orderRepository});
 
   @override
   LoginFormState createState() => LoginFormState();
@@ -75,63 +77,89 @@ class LoginFormState extends State<LoginForm> {
               const SnackBar(content: Text('Logging in...')),
             );
           } else if (state is AuthenticationAuthenticated) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen(
-                authenticationRepository: widget.authenticationRepository,
-                userRepository: widget.userRepository,
-              )
-              ),
-            );
+            if(state.role == 'user'){
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen(
+                  authenticationRepository: widget.authenticationRepository,
+                  userRepository: widget.userRepository,
+                  orderRepository: widget.orderRepository,
+                )
+                ),
+              );
+            } else if(state.role =='admin'){
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AdminMainScreen()
+                ),
+              );
+            }
+
           } else if (state is AuthenticationError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
           }
         },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                // Add email validation logic here if needed
-                return null;
-              },
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: Colors.black, // Set border color
+                width: 1.0, // Set border width
+              ),
+              borderRadius: BorderRadius.circular(16.0),
             ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-              obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                // Add password validation logic here if needed
-                return null;
-              },
+            height: 250,
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(labelText: 'Email', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    // Add email validation logic here if needed
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password', labelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    // Add password validation logic here if needed
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                FloatingActionButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Dispatch AuthenticationSignInRequested event
+                      BlocProvider.of<AuthenticationBloc>(context).add(
+                        AuthenticationSignInRequested(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Login', style: TextStyle(fontSize: 25),),
+                ),
+              ],
             ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // Dispatch AuthenticationSignInRequested event
-                  BlocProvider.of<AuthenticationBloc>(context).add(
-                    AuthenticationSignInRequested(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                    ),
-                  );
-                }
-              },
-              child: const Text('Login'),
-            ),
-          ],
+          ),
         ),
       ),
     );

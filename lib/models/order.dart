@@ -1,40 +1,65 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'cart.dart';
+
 class Order {
-  final String orderID;
-  final String userID;
-  final List<Map<String, dynamic>> products; // List of product IDs and quantities
-  final double totalPrice;
-  final String orderStatus;
+  final String id;
+  final List<CartItem> items;
+  final double total;
+  final DateTime createdAt;
   final String paymentMethod;
-  // Add other order details as needed
+  final String userId;
+  final String userName;
+  final String contactNo;
+  final String address;
+  final String status;
+  final bool isReview;
 
   Order({
-    required this.orderID,
-    required this.userID,
-    required this.products,
-    required this.totalPrice,
-    required this.orderStatus,
+    required this.id,
+    required this.items,
+    required this.total,
+    required this.createdAt,
     required this.paymentMethod,
+    required this.userId,
+    required this.userName,
+    required this.contactNo,
+    required this.address,
+    required this.status,
+    required this.isReview,
   });
-
-  factory Order.fromMap(Map<String, dynamic> data) {
-    return Order(
-      orderID: data['orderID'],
-      userID: data['userID'],
-      products: List<Map<String, dynamic>>.from(data['products']),
-      totalPrice: data['totalPrice'],
-      orderStatus: data['orderStatus'],
-      paymentMethod: data['paymentMethod'],
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return {
-      'orderID': orderID,
-      'userID': userID,
-      'products': products,
-      'totalPrice': totalPrice,
-      'orderStatus': orderStatus,
+      'id': id,
+      'items': items.map((item) => item.toMap()).toList(),
+      'total': total,
+      'createdAt': createdAt,
       'paymentMethod': paymentMethod,
+      'userId': userId,
+      'userName': userName,
+      'contactNo': contactNo,
+      'address': address,
+      'status': status,
+      'isReview': isReview,
     };
+  }
+
+  factory Order.fromMap(Map<String, dynamic> data, String id) {
+    return Order(
+      id: id,
+      items: (data['items'] as List)
+          .map((item) => CartItem.fromMap(item))
+          .toList(),
+      total: data['total'],
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      paymentMethod: data['paymentMethod'],
+      userId: data['userId'],
+      userName: data['userName'],
+      contactNo: data['contactNo'],
+      address: data['address'],
+      status: data['status'],
+      isReview: data['isReview']
+    );
   }
 }

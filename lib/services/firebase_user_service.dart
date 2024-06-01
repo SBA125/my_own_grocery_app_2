@@ -24,7 +24,7 @@ class FirebaseUserService {
           'userID': user.userID,
           'email': user.email,
           'username': user.username,
-          'role': 'hello'
+          'role': 'user'
           // Add other user fields if necessary
         });
 
@@ -33,6 +33,21 @@ class FirebaseUserService {
       });
     } catch (e) {
       throw Exception('Failed to add user to database: $e');
+    }
+  }
+
+  Future<String> getUserRole(String userID) async {
+    final doc = await _firestore.collection('Users').doc('allUsers').get();
+    if (doc.exists) {
+      final usersList = doc.data()?['usersList'] ?? [];
+      final userData = usersList.firstWhere((user) => user['userID'] == userID, orElse: () => null);
+      if (userData != null) {
+        return userData['role'] ?? 'user';
+      } else {
+        return 'user';
+      }
+    } else {
+      return 'user';
     }
   }
 
@@ -53,10 +68,9 @@ class FirebaseUserService {
             userID: userData['userID'],
             username: userData['username'],
             email: userData['email'],
-            role: userData['role'] ?? 'user', // Fetch the role if stored
+            role: userData['role'] ?? 'user',
           );
         } else {
-          // If user data is not found in 'allUsers', we can add it
           final newUser = User(
             userID: currentUser.uid.toString(),
             username: currentUser.displayName ?? 'Unknown',

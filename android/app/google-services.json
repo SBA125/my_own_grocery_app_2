@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "521102319461",
+    "firebase_url": "https://groceryproject-49143-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "groceryproject-49143",
     "storage_bucket": "groceryproject-49143.appspot.com"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.my_own_grocery_app_2"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "521102319461-28o1nv4bo3jh3mqule003f9dkfl7mqgl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.my_own_grocery_app_2",
+            "certificate_hash": "44b83376826cb1a91422e7056534194516c6cdca"
+          }
+        },
+        {
+          "client_id": "521102319461-cqked5m01cth83ogl8ckl1g68cqovasu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB4AG2bp6O6glLsynUx_s0T-7GxfkwrIwk"
@@ -20,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521102319461-cqked5m01cth83ogl8ckl1g68cqovasu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "521102319461-3qtjm1k428710l26l1g8qtbslflhbbi2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.myOwnGroceryApp"
+              }
+            }
+          ]
         }
       }
     }

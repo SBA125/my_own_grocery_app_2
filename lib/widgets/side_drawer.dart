@@ -4,14 +4,17 @@ import 'package:my_own_grocery_app_2/blocs/authentication/authentication_bloc.da
 import 'package:my_own_grocery_app_2/blocs/authentication/authentication_state.dart';
 import 'package:my_own_grocery_app_2/main.dart';
 import 'package:my_own_grocery_app_2/repositories/authentication_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/order_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
-import 'package:my_own_grocery_app_2/screens/user_profile/user_profile_screen.dart';
+import 'package:my_own_grocery_app_2/screens/user/order_history.dart';
+import 'package:my_own_grocery_app_2/screens/user/user_profile_screen.dart';
 
 class SideDrawer extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;
+  final OrderRepository orderRepository;
 
-  const SideDrawer({super.key, required this.authenticationRepository, required this.userRepository});
+  const SideDrawer({super.key, required this.authenticationRepository, required this.userRepository, required this.orderRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class SideDrawer extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => UserProfileScreen(userRepository: userRepository, authenticationRepository: authenticationRepository)),
+                      MaterialPageRoute(builder: (context) => UserProfileScreen(userRepository: userRepository, authenticationRepository: authenticationRepository, orderRepository: orderRepository,)),
                     );
                   },
                   child: const Text('View Profile', style: TextStyle(color: Colors.black),),
@@ -49,7 +52,7 @@ class SideDrawer extends StatelessWidget {
               } else if (state is AuthenticationUnauthenticated) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MainScreen(authenticationRepository: authenticationRepository)),
+                  MaterialPageRoute(builder: (context) => MainScreen(authenticationRepository: authenticationRepository, userRepository: userRepository,)),
                 );
               } else if (state is AuthenticationError) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -67,7 +70,7 @@ class SideDrawer extends StatelessWidget {
                         authenticationRepository.signOut();
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => MainScreen(authenticationRepository: authenticationRepository)),
+                          MaterialPageRoute(builder: (context) => MainScreen(authenticationRepository: authenticationRepository, userRepository: userRepository,)),
                         );
                       },
                       icon: const Icon(Icons.logout_rounded, color: Colors.black,),
@@ -76,6 +79,21 @@ class SideDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextButton.icon(
+                      onPressed: (){
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => OrderHistory(orderRepository: orderRepository, authenticationRepository: authenticationRepository, userRepository: userRepository)),
+                        );
+                      },
+                      icon: const Icon(Icons.shopping_cart, color: Colors.black,),
+                      label: const Text('Orders', style: TextStyle(color: Colors.black),),
+                    )
+                  ],
+                )
               ],
             ),
           ),

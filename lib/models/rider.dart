@@ -1,7 +1,6 @@
 class Rider {
   final String riderID;
   final String userID;
-  // Add other rider-specific fields as needed
 
   Rider({
     required this.riderID,

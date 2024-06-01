@@ -33,6 +33,8 @@ class AuthenticationSignUpRequested extends AuthenticationEvent {
   List<Object> get props => [email, password];
 }
 
+class AuthenticationGmailLoginRequested extends AuthenticationEvent {}
+
 // Event to request sign-out
 class AuthenticationSignOutRequested extends AuthenticationEvent {
   const AuthenticationSignOutRequested();

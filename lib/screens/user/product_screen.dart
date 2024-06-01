@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
-
-import '../blocs/cart/cart_bloc.dart';
-import '../blocs/cart/cart_event.dart';
-import '../blocs/products/product_bloc.dart';
-import '../blocs/products/product_state.dart';
-import '../blocs/products/product_event.dart';
-import '../models/cart.dart';
-import '../models/category.dart';
-import '../models/product.dart';
-import '../repositories/product_repository.dart';
-import '../services/firebase_product_service.dart';
+import '../../blocs/cart/cart_bloc.dart';
+import '../../blocs/cart/cart_event.dart';
+import '../../blocs/products/product_bloc.dart';
+import '../../blocs/products/product_state.dart';
+import '../../blocs/products/product_event.dart';
+import '../../models/cart.dart';
+import '../../models/category.dart';
+import '../../models/product.dart';
+import '../../repositories/product_repository.dart';
+import '../../services/firebase_product_service.dart';
 
 
 class ProductScreen extends StatelessWidget {
@@ -134,8 +133,13 @@ class ProductCard extends StatelessWidget {
                       quantity: 1,
                       imageUrl: product.imageUrl,
                     );
-
                     context.read<CartBloc>().add(AddItemToCart(cartItem));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${product.name} added to cart'),
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
                   },
                   child: const Text('Add to cart'),
                 ),

@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:my_own_grocery_app_2/blocs/admin/admin_bloc.dart';
+import 'package:my_own_grocery_app_2/blocs/authentication/authentication_state.dart';
+import 'package:my_own_grocery_app_2/blocs/cart/cart_bloc.dart';
+import 'package:my_own_grocery_app_2/blocs/orders/order_bloc.dart';
 import 'package:my_own_grocery_app_2/blocs/products/product_bloc.dart';
+import 'package:my_own_grocery_app_2/blocs/rider/rider_bloc.dart';
 import 'package:my_own_grocery_app_2/blocs/users/user_bloc.dart';
+import 'package:my_own_grocery_app_2/repositories/admin_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/category_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/order_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/product_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/rider_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
+import 'package:my_own_grocery_app_2/services/firebase_admin_service.dart';
 import 'package:my_own_grocery_app_2/services/firebase_auth_service.dart';
 import 'package:my_own_grocery_app_2/services/firebase_category_service.dart';
+import 'package:my_own_grocery_app_2/services/firebase_order_service.dart';
 import 'package:my_own_grocery_app_2/services/firebase_product_service.dart';
+import 'package:my_own_grocery_app_2/services/firebase_rider_service.dart';
 import 'package:my_own_grocery_app_2/services/firebase_user_service.dart';
+import 'blocs/authentication/authentication_event.dart';
 import 'blocs/categories/category_bloc.dart';
 import 'blocs/categories/category_event.dart';
 import 'firebase_options.dart';
 import 'package:video_player/video_player.dart';
-
 import 'repositories/authentication_repository.dart';
 import 'screens/authentication/login_screen.dart';
 import 'screens/authentication/register_screen.dart';
-import 'screens/home/home_screen.dart';
+import 'screens/user/home_screen.dart';
 import 'blocs/authentication/authentication_bloc.dart';
 
 void main() async {
@@ -31,6 +42,9 @@ void main() async {
   final CategoryRepository categoryRepository = CategoryRepository(firebaseCategoryService: FirebaseCategoryService());
   final ProductRepository productRepository = ProductRepository(firebaseProductService: FirebaseProductService());
   final UserRepository userRepository = UserRepository(firebaseUserService: FirebaseUserService());
+  final OrderRepository orderRepository = OrderRepository(orderService: OrderService());
+  final AdminRepository adminRepository = AdminRepository(firebaseAdminService: FirebaseAdminService());
+  final RiderRepository riderRepository = RiderRepository(firebaseRiderService: FirebaseRiderService());
 
   runApp(
     MultiBlocProvider(
@@ -47,8 +61,20 @@ void main() async {
         BlocProvider(
             create: (_) => UserBloc(userRepository: userRepository)
         ),
+        BlocProvider(
+            create: (_) => CartBloc()
+        ),
+        BlocProvider(
+            create: (_) => OrderBloc(orderRepository: orderRepository)
+        ),
+        BlocProvider(
+            create: (_) => AdminBloc(adminRepository: adminRepository)
+        ),
+        BlocProvider(
+            create: (_) => RiderBloc(riderRepository: riderRepository)
+        )
       ],
-      child: MyApp(authenticationRepository: authenticationRepository, userRepository: userRepository,),
+      child: MyApp(authenticationRepository: authenticationRepository, userRepository: userRepository, orderRepository: orderRepository,),
     ),
   );
 }
@@ -56,19 +82,20 @@ void main() async {
 class MyApp extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;
+  final OrderRepository orderRepository;
 
-  const MyApp({super.key, required this.authenticationRepository, required this.userRepository});
+  const MyApp({super.key, required this.authenticationRepository, required this.userRepository, required this.orderRepository});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Grocery App',
-      home: MainScreen(authenticationRepository: authenticationRepository),
+      home: MainScreen(authenticationRepository: authenticationRepository, userRepository: userRepository,),
       initialRoute: '/',
       routes: {
-        '/register': (context) => RegisterScreen(authenticationRepository: authenticationRepository, userRepository: userRepository),
-        '/login': (context) => LoginScreen(authenticationRepository: authenticationRepository, userRepository: userRepository),
-        '/home': (context) => HomeScreen(authenticationRepository: authenticationRepository, userRepository: userRepository),
+        '/register': (context) => RegisterScreen(authenticationRepository: authenticationRepository, userRepository: userRepository, orderRepository: orderRepository,),
+        '/login': (context) => LoginScreen(authenticationRepository: authenticationRepository, userRepository: userRepository, orderRepository: orderRepository,),
+        '/home': (context) => HomeScreen(authenticationRepository: authenticationRepository, userRepository: userRepository, orderRepository: orderRepository,),
       },
     );
   }
@@ -76,7 +103,8 @@ class MyApp extends StatelessWidget {
 
 class MainScreen extends StatefulWidget {
   final AuthenticationRepository authenticationRepository;
-  const MainScreen({super.key, required this.authenticationRepository});
+  final UserRepository userRepository;
+  const MainScreen({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
   MainScreenState createState() => MainScreenState();
@@ -104,7 +132,21 @@ class MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        if (state is AuthenticationLoading) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Logging in...')),
+          );
+        } else if (state is AuthenticationAuthenticated) {
+          Navigator.pushNamed(context, '/home');
+        } else if (state is AuthenticationError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+  child: Scaffold(
       body: Stack(
         children: [
           _controller.value.isInitialized
@@ -153,10 +195,7 @@ class MainScreenState extends State<MainScreen> {
                     width: 250,
                     child: ElevatedButton(
                       onPressed: () async {
-                       await widget.authenticationRepository.signInWithGoogle();
-                       if (mounted) {
-                         Navigator.pushNamed(context, '/home');
-                       }
+                       BlocProvider.of<AuthenticationBloc>(context).add(AuthenticationGmailLoginRequested());
                       },
                       child: const Text(
                         'Login With Gmail',
@@ -171,7 +210,6 @@ class MainScreenState extends State<MainScreen> {
                       onPressed: () {
                         // Navigate to register screen
                         Navigator.pushNamed(context, '/register');
-
                       },
                       child: const Text(
                         'Register',
@@ -186,6 +224,7 @@ class MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-    );
+    ),
+);
   }
 }

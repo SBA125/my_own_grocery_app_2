@@ -16,11 +16,11 @@ class AuthenticationInitial extends AuthenticationState {
 // State indicating that the user is authenticated
 class AuthenticationAuthenticated extends AuthenticationState {
   final User user;
-
-  const AuthenticationAuthenticated(this.user);
+  final String role;
+  const AuthenticationAuthenticated(this.user, this.role);
 
   @override
-  List<Object> get props => [user];
+  List<Object> get props => [user, role];
 }
 
 // State indicating that the user is not authenticated

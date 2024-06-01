@@ -9,7 +9,8 @@ class AuthenticationRepository {
 
   Future<User?> signInWithGoogle() async {
     try {
-      return await _authService.signInWithGoogle();
+      User? user = await _authService.signInWithGoogle();
+      return user;
     } catch (e) {
       print("Error signing in with Google: $e");
       return null;
@@ -24,7 +25,7 @@ class AuthenticationRepository {
     return _authService.signUpWithEmailAndPassword(email, password, username);
   }
 
-  Future<void> signOut() {
-    return _authService.signOut();
+  Future<void> signOut() async {
+    await _authService.signOut();
   }
 }

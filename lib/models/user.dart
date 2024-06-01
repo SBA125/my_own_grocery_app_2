@@ -3,7 +3,6 @@ class User {
   final String username;
   final String email;
   final String role;
-  // Add other user details as needed
 
   User({
     required this.userID,

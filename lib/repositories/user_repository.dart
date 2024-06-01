@@ -10,6 +10,10 @@ class UserRepository {
     await firebaseUserService.addUserToDatabase(user);
   }
 
+  Future<String> getUserRole(String userID) async{
+    return await firebaseUserService.getUserRole(userID);
+  }
+
   Future<User> displayUserDetails() async{
     return await firebaseUserService.displayUserDetails();
   }
