@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_own_grocery_app_2/blocs/authentication/authentication_event.dart';
 import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
-import 'package:my_own_grocery_app_2/screens/home/home_screen.dart';
+import 'package:my_own_grocery_app_2/screens/home_screen.dart';
 
-import '../../blocs/authentication/authentication_bloc.dart';
-import '../../blocs/authentication/authentication_state.dart';
-import '../../repositories/authentication_repository.dart';
+import '../blocs/authentication/authentication_bloc.dart';
+import '../blocs/authentication/authentication_state.dart';
+import '../repositories/authentication_repository.dart';
 class RegisterScreen extends StatelessWidget {
   final AuthenticationRepository authenticationRepository;
   final UserRepository userRepository;

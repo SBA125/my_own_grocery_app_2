@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_own_grocery_app_2/screens/products/product_screen.dart';
-import '../../blocs/categories/category_bloc.dart';
-import '../../blocs/categories/category_state.dart';
-import '../../models/category.dart';
+import 'package:my_own_grocery_app_2/screens/product_screen.dart';
+import '../blocs/categories/category_bloc.dart';
+import '../blocs/categories/category_state.dart';
+import '../models/category.dart';
 
 class CategoryList extends StatelessWidget {
   const CategoryList({super.key});

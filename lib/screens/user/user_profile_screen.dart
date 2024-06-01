@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_own_grocery_app_2/blocs/users/user_event.dart';
 import 'package:my_own_grocery_app_2/models/user.dart';
 import 'package:my_own_grocery_app_2/repositories/authentication_repository.dart';
-import 'package:my_own_grocery_app_2/screens/home/home_screen.dart';
+import 'package:my_own_grocery_app_2/screens/home_screen.dart';
 
-import '../../blocs/users/user_bloc.dart';
-import '../../blocs/users/user_state.dart';
-import '../../repositories/user_repository.dart';
+import '../blocs/users/user_bloc.dart';
+import '../blocs/users/user_state.dart';
+import '../repositories/user_repository.dart';
 
 class UserProfileScreen extends StatelessWidget {
   final UserRepository userRepository;

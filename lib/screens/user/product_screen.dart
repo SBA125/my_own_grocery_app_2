@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
-import '../../blocs/products/product_bloc.dart';
-import '../../blocs/products/product_state.dart';
-import '../../blocs/products/product_event.dart';
-import '../../models/category.dart';
-import '../../models/product.dart';
-import '../../repositories/product_repository.dart';
-import '../../services/firebase_product_service.dart';
+import '../blocs/cart/cart_bloc.dart';
+import '../blocs/cart/cart_event.dart';
+import '../blocs/products/product_bloc.dart';
+import '../blocs/products/product_state.dart';
+import '../blocs/products/product_event.dart';
+import '../models/cart.dart';
+import '../models/category.dart';
+import '../models/product.dart';
+import '../repositories/product_repository.dart';
+import '../services/firebase_product_service.dart';
 
 
 class ProductScreen extends StatelessWidget {
@@ -29,10 +33,17 @@ class ProductScreen extends StatelessWidget {
               fit: BoxFit.cover
           ),
         ),
-        child: BlocProvider<ProductBloc>(
-          create: (context) => ProductBloc(
-            productRepository: productRepository,
-          )..add(LoadProductsByCategory(category.productIDs)),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<ProductBloc>(
+              create: (context) => ProductBloc(
+                productRepository: productRepository,
+              )..add(LoadProductsByCategory(category.productIDs)),
+            ),
+            BlocProvider<CartBloc>.value(
+              value: BlocProvider.of<CartBloc>(context),
+            ),
+          ],
           child: const ProductList(),
         ),
       ),
@@ -62,7 +73,7 @@ class ProductList extends StatelessWidget {
             itemCount: products.length,
             itemBuilder: (context, index) {
               final product = products[index];
-              return ProductCard(product: product);
+              return ProductCard(product: product!);
             },
           );
         } else if (state is ProductError) {
@@ -76,7 +87,7 @@ class ProductList extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  final Product? product;
+  final Product product;
 
   const ProductCard({super.key, required this.product});
 
@@ -93,9 +104,8 @@ class ProductCard extends StatelessWidget {
                 topRight: Radius.circular(4),
               ),
               child: Image.network(
-                product!.imageUrl,
+                product.imageUrl,
                 fit: BoxFit.contain,
-                // width: double.infinity,
               ),
             ),
           ),
@@ -104,18 +114,30 @@ class ProductCard extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  product!.name,
+                  product.name,
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 Text(
-                  'Rs.${product?.price}',
+                  'Rs.${product.price}',
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 TextButton(
-                    onPressed: (){},
-                    child: const Text('Add to cart')
+                  onPressed: () {
+                    var uuid = const Uuid();
+                    final cartItem = CartItem(
+                      id: uuid.v4(),
+                      productId: product.productID,
+                      name: product.name,
+                      price: product.price,
+                      quantity: 1,
+                      imageUrl: product.imageUrl,
+                    );
+
+                    context.read<CartBloc>().add(AddItemToCart(cartItem));
+                  },
+                  child: const Text('Add to cart'),
                 ),
               ],
             ),
@@ -125,3 +147,4 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
+
