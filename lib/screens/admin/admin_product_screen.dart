@@ -17,31 +17,39 @@ class AdminProductScreen extends StatelessWidget {
         title: const Text('All Products'),
         centerTitle: true,
       ),
-      body: BlocBuilder<AdminBloc, AdminState>(
-        builder: (context, state) {
-          if (state is AdminLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is AdminLoadedProducts) {
-            return GridView.builder(
-              padding: const EdgeInsets.all(16.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.7,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 15,
-              ),
-              itemCount: state.products.length,
-              itemBuilder: (context, index) {
-                final product = state.products[index];
-                return ProductCard(product: product);
-              },
-            );
-          } else if (state is AdminFailure) {
-            return Center(child: Text('Failed to load products: ${state.error}'));
-          } else {
-            return const Center(child: Text('No products found'));
-          }
-        },
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/pictures/96.jpg'),
+              fit: BoxFit.cover
+          ),
+        ),
+        child: BlocBuilder<AdminBloc, AdminState>(
+          builder: (context, state) {
+            if (state is AdminLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is AdminLoadedProducts) {
+              return GridView.builder(
+                padding: const EdgeInsets.all(16.0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.7,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 15,
+                ),
+                itemCount: state.products.length,
+                itemBuilder: (context, index) {
+                  final product = state.products[index];
+                  return ProductCard(product: product);
+                },
+              );
+            } else if (state is AdminFailure) {
+              return Center(child: Text('Failed to load products: ${state.error}'));
+            } else {
+              return const Center(child: Text('No products found'));
+            }
+          },
+        ),
       ),
     );
   }

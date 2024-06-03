@@ -44,111 +44,124 @@ class OrderHistory extends StatelessWidget {
           },
         ),
       ),
-      body: BlocProvider(
-        create: (context) => OrderBloc(orderRepository: orderRepository)
-          ..add(FetchOrderHistory((context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user.uid)),
-        child: BlocBuilder<OrderBloc, OrderState>(
-          builder: (context, state) {
-            if (state is OrderHistoryLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is OrderHistoryLoaded) {
-              if (state.orders.isEmpty) {
-                return const Center(child: Text('No orders found'));
-              }
-              return ListView.builder(
-                itemCount: state.orders.length,
-                itemBuilder: (context, index) {
-                  final order = state.orders[index];
-                  if(order.status == 'delivery complete'){
-                    return Card(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/pictures/96.jpg'),
+              fit: BoxFit.cover
+          ),
+        ),
+        child: BlocProvider(
+          create: (context) => OrderBloc(orderRepository: orderRepository)
+            ..add(FetchOrderHistory((context.read<AuthenticationBloc>().state as AuthenticationAuthenticated).user.uid)),
+          child: BlocBuilder<OrderBloc, OrderState>(
+            builder: (context, state) {
+              if (state is OrderHistoryLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is OrderHistoryLoaded) {
+                if (state.orders.isEmpty) {
+                  return const Center(child: Text('No orders found'));
+                }
+                return ListView.builder(
+                  itemCount: state.orders.length,
+                  itemBuilder: (context, index) {
+                    final order = state.orders[index];
+                    return Container(
                       margin: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-                      child: ListTile(
-                        title: Text('Order ${index+1}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Total: Rs.${order.total.toStringAsFixed(2)}'),
-                            Text('Status: ${order.status}'),
-                            Text('Date: ${order.createdAt.toLocal().toString()}'),
-                            const Text('Cart Items:'),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: order.items.length,
-                              itemBuilder: (context, itemIndex) {
-                                final cartItem = order.items[itemIndex];
-                                return ListTile(
-                                  title: Text(cartItem.name),
-                                  subtitle: Text('Quantity: ${cartItem.quantity}, Unit Price: Rs.${cartItem.price.toStringAsFixed(2)}'),
-                                );
-                              },
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 1.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Card(
+                        elevation: 0,
+                        margin: EdgeInsets.zero,
+                        child: ListTile(
+                          title: Center(
+                            child: Text(
+                              'Order ${index + 1}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25.0,
+                              ),
                             ),
-                            TextButton(
-                                onPressed: (){
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AddReviewScreen(
-                                        orderID: order.id,
-                                        orderRepository: orderRepository,
-                                        authenticationRepository: authenticationRepository,
-                                        userRepository: userRepository,
-                                      )
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Total: Rs.${order.total.toStringAsFixed(1)}'),
+                              Text('Status: ${order.status}'),
+                              Text('Date: ${order.createdAt.toLocal().toString()}'),
+                              const SizedBox(height: 20,),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black, width: 1.0),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Column(
+                                  children: [
+                                    const Center(child: Text('Cart Items:', style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0,
+                                    ),)),
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: order.items.length,
+                                      itemBuilder: (context, itemIndex) {
+                                        final cartItem = order.items[itemIndex];
+                                        return ListTile(
+                                          title: Text(cartItem.name),
+                                          subtitle: Text(
+                                            'Quantity: ${cartItem.quantity}, Unit Price: Rs.${cartItem.price.toStringAsFixed(1)}',
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      side: const BorderSide(color: Colors.black, width: 1.0),
+                                  ],
+                                ),
+                              ),
+                              if (order.status == 'delivery complete')
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AddReviewScreen(
+                                          orderID: order.id,
+                                          orderRepository: orderRepository,
+                                          authenticationRepository: authenticationRepository,
+                                          userRepository: userRepository,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20.0),
+                                        side: const BorderSide(color: Colors.black, width: 1.0),
+                                      ),
                                     ),
                                   ),
+                                  child: const Text('Review'),
                                 ),
-                                child: const Text('Review')
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
-                  } else{
-                    return Card(
-                      margin: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-                      child: ListTile(
-                        title: Text('Order ${index+1}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Total: Rs.${order.total.toStringAsFixed(2)}'),
-                            Text('Status: ${order.status}'),
-                            Text('Date: ${order.createdAt.toLocal().toString()}'),
-                            const Text('Cart Items:'),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: order.items.length,
-                              itemBuilder: (context, itemIndex) {
-                                final cartItem = order.items[itemIndex];
-                                return ListTile(
-                                  title: Text(cartItem.name),
-                                  subtitle: Text('Quantity: ${cartItem.quantity}, Unit Price: Rs.${cartItem.price.toStringAsFixed(2)}'),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                },
-              );
-            } else if (state is OrderHistoryError) {
-              return Center(child: Text(state.message));
-            } else {
-              return const Center(child: Text('No orders found'));
-            }
-          },
+                  },
+                );
+              } else if (state is OrderHistoryError) {
+                return Center(child: Text(state.message));
+              } else {
+                return const Center(child: Text('No orders found'));
+              }
+            },
+          ),
         ),
       ),
     );
   }
 }
-
