@@ -3,7 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/order.dart' as userOrder;
 
 class FirebaseRiderService{
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+
+  FirebaseRiderService({FirebaseFirestore? firestore}) : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<List<userOrder.Order>> getAllOrders() async {
     final snapshot = await _firestore.collection('Orders').get();
@@ -18,5 +20,4 @@ class FirebaseRiderService{
       throw Exception('Order not found');
     }
   }
-
 }

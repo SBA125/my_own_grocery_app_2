@@ -56,4 +56,25 @@ class Product {
     );
   }
 
+  Product copyWith({
+    required String productID,
+    required String name,
+    required String description,
+    required int price,
+    required String imageUrl,
+    required int quantity,
+    required bool inStock,
+  }) {
+    return Product(
+      productID: productID,
+      name: name,
+      description: description,
+      price: price,
+      imageUrl: imageUrl,
+      quantity: quantity,
+      inStock: inStock,
+    );
+  }
+
+
 }

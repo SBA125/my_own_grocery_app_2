@@ -8,12 +8,10 @@ abstract class AuthenticationState extends Equatable {
   List<Object> get props => [];
 }
 
-// Initial state
-class AuthenticationInitial extends AuthenticationState {
 
-}
+class AuthenticationInitial extends AuthenticationState {}
 
-// State indicating that the user is authenticated
+
 class AuthenticationAuthenticated extends AuthenticationState {
   final User user;
   final String role;
@@ -23,13 +21,12 @@ class AuthenticationAuthenticated extends AuthenticationState {
   List<Object> get props => [user, role];
 }
 
-// State indicating that the user is not authenticated
+
 class AuthenticationUnauthenticated extends AuthenticationState {}
 
-// State indicating that authentication is in progress
+
 class AuthenticationLoading extends AuthenticationState {}
 
-// State indicating that an error occurred during authentication
 class AuthenticationError extends AuthenticationState {
   final String message;
 

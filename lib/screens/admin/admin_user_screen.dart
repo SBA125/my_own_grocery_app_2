@@ -9,7 +9,6 @@ class AdminUserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Load users when the widget is built
     BlocProvider.of<AdminBloc>(context).add(LoadAllUsers());
 
     return Scaffold(
@@ -24,8 +23,8 @@ class AdminUserScreen extends StatelessWidget {
             return GridView.builder(
               padding: const EdgeInsets.all(16.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1, // Adjust the number of columns as needed
-                childAspectRatio: 3/2, // Adjust the aspect ratio as needed
+                crossAxisCount: 1,
+                childAspectRatio: 3/2,
                 crossAxisSpacing: 5.0,
                 mainAxisSpacing: 10.0,
               ),

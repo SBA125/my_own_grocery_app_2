@@ -23,5 +23,8 @@ class OrderRepository {
     return await orderService.getOrderHistory(userId);
   }
 
-// Other repository methods like updateOrderStatus, getOrderHistory, etc.
+  Future<void> updateOrderStatus(String orderID, Map<String,dynamic> updatedOrder) async{
+    await orderService.updateOrderStatus(orderID, updatedOrder);
+  }
+
 }

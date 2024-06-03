@@ -10,7 +10,6 @@ class AdminCategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Load users when the widget is built
     BlocProvider.of<AdminBloc>(context).add(LoadAllCategories());
 
     return Scaffold(
@@ -52,6 +51,55 @@ class CategoryCard extends StatelessWidget {
 
   const CategoryCard({super.key, required this.category});
 
+  void _showEditCategoryDialog(BuildContext context) {
+    final TextEditingController nameController = TextEditingController(text: category.name);
+    final TextEditingController imageUrlController = TextEditingController(text: category.imageUrl);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Category'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Category Name'),
+              ),
+              TextField(
+                controller: imageUrlController,
+                decoration: const InputDecoration(labelText: 'Image URL'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final updatedCategory = category.copyWith(
+                  categoryID: category.categoryID,
+                  name: nameController.text,
+                  imageUrl: imageUrlController.text,
+                  productIDs: category.productIDs
+                );
+                final adminBloc = BlocProvider.of<AdminBloc>(context);
+                adminBloc.add(UpdateCategory(category.categoryID, updatedCategory));
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -67,7 +115,6 @@ class CategoryCard extends StatelessWidget {
               child: Image.network(
                 category.imageUrl,
                 fit: BoxFit.cover,
-                // width: double.infinity,
               ),
             ),
           ),
@@ -81,8 +128,8 @@ class CategoryCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 TextButton(
-                  onPressed: (){
-
+                  onPressed: () {
+                    _showEditCategoryDialog(context);
                   },
                   style: ButtonStyle(
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(

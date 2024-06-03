@@ -64,7 +64,7 @@ class AdminRepository{
     return await firebaseAdminService.getAllOrders();
   }
 
-  Future<List<Rider>> getAllRiders() async{
+  Future<List<User>> getAllRiders() async{
     return await firebaseAdminService.getAllRiders();
   }
 

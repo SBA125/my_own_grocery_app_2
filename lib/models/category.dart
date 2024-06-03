@@ -2,7 +2,7 @@ class Category {
   final String categoryID;
   final String name;
   final String imageUrl;
-  final List<String> productIDs; // List of product IDs associated with this category
+  final List<String> productIDs;
 
   Category({
     required this.categoryID,
@@ -28,5 +28,18 @@ class Category {
       'productIDs': productIDs,
     };
   }
-}
 
+  Category copyWith({
+    required String categoryID,
+    required String name,
+    required String imageUrl,
+    required List<String> productIDs,
+  }) {
+    return Category(
+      categoryID: categoryID,
+      name: name,
+      imageUrl: imageUrl,
+      productIDs: productIDs,
+    );
+  }
+}

@@ -56,7 +56,7 @@ class AdminLoadedOrders extends AdminState {
 }
 
 class AdminLoadedRiders extends AdminState {
-  final List<Rider> riders;
+  final List<User> riders;
 
   const AdminLoadedRiders(this.riders);
 

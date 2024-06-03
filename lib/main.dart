@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -41,7 +43,7 @@ void main() async {
   final AuthenticationRepository authenticationRepository = AuthenticationRepository(FirebaseAuthService());
   final CategoryRepository categoryRepository = CategoryRepository(firebaseCategoryService: FirebaseCategoryService());
   final ProductRepository productRepository = ProductRepository(firebaseProductService: FirebaseProductService());
-  final UserRepository userRepository = UserRepository(firebaseUserService: FirebaseUserService());
+  final UserRepository userRepository = UserRepository(firebaseUserService: FirebaseUserService(firestore: FirebaseFirestore.instance, firebaseAuth: FirebaseAuth.instance));
   final OrderRepository orderRepository = OrderRepository(orderService: OrderService());
   final AdminRepository adminRepository = AdminRepository(firebaseAdminService: FirebaseAdminService());
   final RiderRepository riderRepository = RiderRepository(firebaseRiderService: FirebaseRiderService());
@@ -71,7 +73,7 @@ void main() async {
             create: (_) => AdminBloc(adminRepository: adminRepository)
         ),
         BlocProvider(
-            create: (_) => RiderBloc(riderRepository: riderRepository)
+            create: (_) => RiderBloc(riderRepository: riderRepository, orderRepository: orderRepository)
         )
       ],
       child: MyApp(authenticationRepository: authenticationRepository, userRepository: userRepository, orderRepository: orderRepository,),

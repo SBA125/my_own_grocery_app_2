@@ -44,7 +44,7 @@ class CartScreen extends StatelessWidget {
                       final cartItem = state.cartItems[index];
                       final totalItemPrice = cartItem.price * cartItem.quantity;
                       return ListTile(
-                        leading: Image.network(cartItem.imageUrl, width: 80,),
+                        leading: Image.network(cartItem.imageUrl, width: 70,),
                         title: Text(
                           cartItem.name,
                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -71,7 +71,7 @@ class CartScreen extends StatelessWidget {
                               },
                             ),
                             Text(
-                              'Rs.${totalItemPrice.toStringAsFixed(2)}',
+                              'Rs.${totalItemPrice.toStringAsFixed(1)}',
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],

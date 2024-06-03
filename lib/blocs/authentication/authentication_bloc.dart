@@ -75,6 +75,4 @@ class AuthenticationBloc
       emit(AuthenticationError('Sign-out failed: $e')); // Emit error state
     }
   }
-
-
 }

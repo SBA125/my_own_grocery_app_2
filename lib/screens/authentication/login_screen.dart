@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_own_grocery_app_2/repositories/order_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
 import 'package:my_own_grocery_app_2/screens/admin/admin_main_screen.dart';
+import 'package:my_own_grocery_app_2/screens/rider/rider_screen.dart';
 import 'package:my_own_grocery_app_2/screens/user/home_screen.dart';
 import '../../blocs/authentication/authentication_bloc.dart';
 import '../../blocs/authentication/authentication_event.dart';
@@ -91,8 +91,15 @@ class LoginFormState extends State<LoginForm> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const AdminMainScreen()
+                    builder: (context) => AdminMainScreen(authenticationRepository: widget.authenticationRepository, userRepository: widget.userRepository,)
                 ),
+              );
+            } else{
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>  RiderScreen(authenticationRepository: widget.authenticationRepository, userRepository: widget.userRepository,)
+                  ),
               );
             }
 
@@ -107,13 +114,13 @@ class LoginFormState extends State<LoginForm> {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(
-                color: Colors.black, // Set border color
-                width: 1.0, // Set border width
+                color: Colors.black,
+                width: 1.0,
               ),
               borderRadius: BorderRadius.circular(16.0),
             ),
-            height: 250,
-            padding: EdgeInsets.all(16),
+            height: 300,
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +132,6 @@ class LoginFormState extends State<LoginForm> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    // Add email validation logic here if needed
                     return null;
                   },
                 ),
@@ -138,7 +144,6 @@ class LoginFormState extends State<LoginForm> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
                     }
-                    // Add password validation logic here if needed
                     return null;
                   },
                 ),
@@ -146,7 +151,6 @@ class LoginFormState extends State<LoginForm> {
                 FloatingActionButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Dispatch AuthenticationSignInRequested event
                       BlocProvider.of<AuthenticationBloc>(context).add(
                         AuthenticationSignInRequested(
                           email: _emailController.text,

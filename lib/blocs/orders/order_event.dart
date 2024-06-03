@@ -21,3 +21,13 @@ class FetchOrderHistory extends OrderEvent {
   @override
   List<Object> get props => [userID];
 }
+
+class ChangeOrderStatus extends OrderEvent {
+  final String orderId;
+  final String newStatus;
+
+  ChangeOrderStatus(this.orderId, this.newStatus);
+
+  @override
+  List<Object> get props => [orderId, newStatus];
+}

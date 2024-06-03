@@ -10,6 +10,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   OrderBloc({required this.orderRepository}) : super(const OrderInitial()) {
     on<PlaceOrder>(_onPlaceOrder);
     on<FetchOrderHistory>(_onFetchOrderHistory);
+    on<ChangeOrderStatus>(_onChangeOrderStatus);
   }
 
   Future<void> _onPlaceOrder(PlaceOrder event, Emitter<OrderState> emit) async {
@@ -30,6 +31,32 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       emit(OrderHistoryLoaded(orders));
     } catch(e){
       emit(OrderHistoryError(e.toString()));
+    }
+  }
+
+  Future<void> _onChangeOrderStatus(
+      ChangeOrderStatus event, Emitter<OrderState> emit) async {
+    try {
+      emit(const OrderLoading());
+
+
+      final order = await orderRepository.getOrder(event.orderId);
+
+      // Determine the new isReview status based on the new status
+      bool newIsReview;
+      if (event.newStatus == 'delivery complete') {
+        newIsReview = true;
+      } else if (event.newStatus == 'closed') {
+        newIsReview = false;
+      } else {
+        newIsReview = order.isReview;
+      }
+
+      final updatedOrder = order.copyWith(status: event.newStatus, isReview: newIsReview);
+      await orderRepository.updateOrderStatus(event.orderId, updatedOrder.toMap());
+      emit(OrderStatusChanged(updatedOrder));
+    } catch (e) {
+      emit(OrderError(e.toString()));
     }
   }
 

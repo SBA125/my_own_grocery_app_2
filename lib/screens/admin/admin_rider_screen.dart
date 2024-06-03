@@ -9,7 +9,6 @@ class AdminRiderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Load users when the widget is built
     BlocProvider.of<AdminBloc>(context).add(LoadAllRiders());
 
     return Scaffold(
@@ -24,8 +23,8 @@ class AdminRiderScreen extends StatelessWidget {
             return GridView.builder(
               padding: const EdgeInsets.all(16.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1, // Adjust the number of columns as needed
-                childAspectRatio: 5/2, // Adjust the aspect ratio as needed
+                crossAxisCount: 1,
+                childAspectRatio: 5/2,
                 crossAxisSpacing: 5.0,
                 mainAxisSpacing: 10.0,
               ),
@@ -42,7 +41,7 @@ class AdminRiderScreen extends StatelessWidget {
                       children: [
                         Center(
                           child: Text(
-                            'User#${index+1}',
+                            'Rider#${index+1}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 25.0,
@@ -50,14 +49,14 @@ class AdminRiderScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Username: ${rider.userID}',
+                          'Username: ${rider.username}',
                           style: const TextStyle(
                             fontSize: 16.0,
                           ),
                         ),
                         const SizedBox(height: 8.0),
                         Text(
-                          'Email: ${rider.riderID}',
+                          'Email: ${rider.email}',
                           style: const TextStyle(
                             fontSize: 16.0,
                           ),

@@ -14,11 +14,14 @@ class FirebaseAdminService {
     final doc = await _firestore.collection('Users').doc('allUsers').get();
     if (doc.exists) {
       List<dynamic> usersList = doc.data()?['usersList'] ?? [];
-      return usersList.map((data) => User.fromMap(data)).toList();
+      List<User> filteredUsers = usersList
+          .where((data) => data['role'] == 'user')
+          .map((data) => User.fromMap(data))
+          .toList();
+      return filteredUsers;
     }
     return [];
   }
-
   Future<void> deleteUser(String userID) async {
     final doc = await _firestore.collection('Users').doc('allUsers').get();
     if (doc.exists) {
@@ -33,9 +36,9 @@ class FirebaseAdminService {
     if (doc.exists) {
       List<dynamic> productsList = doc.data()?['productsList'] ?? [];
       productsList.add(product.toMap());
-      await _firestore.collection('Products').doc('allProducts').update({'productsList': productsList});
+      await _firestore.collection('Products ').doc('allProducts').update({'productsList': productsList});
     } else {
-      await _firestore.collection('Products').doc('allProducts').set({
+      await _firestore.collection('Products ').doc('allProducts').set({
         'productsList': [product.toMap()],
       });
     }
@@ -45,10 +48,10 @@ class FirebaseAdminService {
     final doc = await _firestore.collection('Products ').doc('allProducts').get();
     if (doc.exists) {
       List<dynamic> productsList = doc.data()?['productsList'] ?? [];
-      int index = productsList.indexWhere((product) => product['id'] == productID);
+      int index = productsList.indexWhere((product) => product['productID'] == productID);
       if (index != -1) {
         productsList[index] = updatedProduct.toMap();
-        await _firestore.collection('Products').doc('allProducts').update({'productsList': productsList});
+        await _firestore.collection('Products ').doc('allProducts').update({'productsList': productsList});
       }
     }
   }
@@ -57,8 +60,8 @@ class FirebaseAdminService {
     final doc = await _firestore.collection('Products ').doc('allProducts').get();
     if (doc.exists) {
       List<dynamic> productsList = doc.data()?['productsList'] ?? [];
-      productsList.removeWhere((product) => product['id'] == productID);
-      await _firestore.collection('Products').doc('allProducts').update({'productsList': productsList});
+      productsList.removeWhere((product) => product['productID'] == productID);
+      await _firestore.collection('Products ').doc('allProducts').update({'productsList': productsList});
     }
   }
 
@@ -75,7 +78,7 @@ class FirebaseAdminService {
     final doc = await _firestore.collection('Products ').doc('allProducts').get();
     if (doc.exists) {
       List<dynamic> productsList = doc.data()?['productsList'] ?? [];
-      var productMap = productsList.firstWhere((product) => product['id'] == productID, orElse: () => null);
+      var productMap = productsList.firstWhere((product) => product['productID'] == productID, orElse: () => null);
       if (productMap != null) {
         return Product.fromMap(productMap);
       }
@@ -100,7 +103,7 @@ class FirebaseAdminService {
     final doc = await _firestore.collection('Categories').doc('allCategories').get();
     if (doc.exists) {
       List<dynamic> categoriesList = doc.data()?['categoriesList'] ?? [];
-      int index = categoriesList.indexWhere((category) => category['id'] == categoryID);
+      int index = categoriesList.indexWhere((category) => category['categoryID'] == categoryID);
       if (index != -1) {
         categoriesList[index] = updatedCategory.toMap();
         await _firestore.collection('Categories').doc('allCategories').update({'categoriesList': categoriesList});
@@ -143,14 +146,24 @@ class FirebaseAdminService {
     return snapshot.docs.map((doc) => userOrder.Order.fromMap(doc.data(), doc.id)).toList();
   }
 
-  Future<List<Rider>> getAllRiders() async {
-    final doc = await _firestore.collection('Riders').doc('allRiders').get();
-    if (doc.exists) {
-      List<dynamic> ridersList = doc.data()?['ridersList'] ?? [];
-      return ridersList.map((data) => Rider.fromMap(data)).toList();
+  Future<List<User>> getAllRiders() async {
+
+    final usersDoc = await _firestore.collection('Users').doc('allUsers').get();
+    if (usersDoc.exists) {
+      List<dynamic> usersList = usersDoc.data()?['usersList'] ?? [];
+      List<User> riders = [];
+      for (var userData in usersList) {
+        if (userData['role'] == 'rider') {
+          User user = User.fromMap(userData);
+          riders.add(user);
+        }
+      }
+      return riders;
     }
     return [];
   }
+
+
 
   Future<List<Review>> getAllReviews() async {
     final doc = await _firestore.collection('Reviews').doc('allReviews').get();

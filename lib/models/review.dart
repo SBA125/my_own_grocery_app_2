@@ -1,11 +1,13 @@
-class Review{
+class Review {
   final String reviewID;
+  final String orderID;
   final DateTime createdAt;
   final String rating;
   final String? additionalNotes;
 
   Review({
     required this.reviewID,
+    required this.orderID,
     required this.createdAt,
     required this.rating,
     this.additionalNotes,
@@ -14,7 +16,8 @@ class Review{
   factory Review.fromMap(Map<String, dynamic> data) {
     return Review(
       reviewID: data['reviewID'],
-      createdAt: data['createdAt'],
+      orderID: data['orderID'],
+      createdAt: data['createdAt'].toDate(),
       rating: data['rating'],
       additionalNotes: data['additionalNotes'],
     );
@@ -23,6 +26,7 @@ class Review{
   Map<String, dynamic> toMap() {
     return {
       'reviewID': reviewID,
+      'orderID': orderID,
       'createdAt': createdAt,
       'rating': rating,
       'additionalNotes': additionalNotes,

@@ -8,11 +8,11 @@ class FirebaseCategoryService {
     try {
       DocumentSnapshot doc = await _firestore.collection('Categories').doc('allCategories').get();
       if (doc.exists) {
-        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // Cast data to Map
+        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
         if (data != null && data.containsKey('categoriesList')) {
-          List<dynamic>? categoriesList = data['categoriesList'] as List<dynamic>?; // Cast categoriesList to List<dynamic>
+          List<dynamic>? categoriesList = data['categoriesList'] as List<dynamic>?;
           if (categoriesList != null) {
-            return categoriesList.map((e) => Category.fromMap(e as Map<String, dynamic>)).toList(); // Cast each element to Map<String, dynamic>
+            return categoriesList.map((e) => Category.fromMap(e as Map<String, dynamic>)).toList();
           } else {
             throw Exception('categoriesList is null');
           }

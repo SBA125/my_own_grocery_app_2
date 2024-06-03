@@ -97,7 +97,7 @@ class RegisterFormState extends State<RegisterForm> {
         ),
         borderRadius: BorderRadius.circular(16.0),
       ),
-      height: 420,
+      height: 520,
       padding: const EdgeInsets.all(16),
       child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -13,7 +13,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   void _loadCart(LoadCart event, Emitter<CartState> emit) {
-    // You can add initial loading logic here if needed
     emit(CartLoaded(cartItems: []));
   }
 

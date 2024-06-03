@@ -4,6 +4,7 @@ import 'package:my_own_grocery_app_2/blocs/authentication/authentication_state.d
 import 'package:my_own_grocery_app_2/repositories/authentication_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/order_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
+import 'package:my_own_grocery_app_2/screens/user/order_review_screen.dart';
 import '../../blocs/authentication/authentication_bloc.dart';
 import '../../blocs/orders/order_bloc.dart';
 import '../../blocs/orders/order_event.dart';
@@ -83,7 +84,17 @@ class OrderHistory extends StatelessWidget {
                             ),
                             TextButton(
                                 onPressed: (){
-
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddReviewScreen(
+                                        orderID: order.id,
+                                        orderRepository: orderRepository,
+                                        authenticationRepository: authenticationRepository,
+                                        userRepository: userRepository,
+                                      )
+                                    ),
+                                  );
                                 },
                                 style: ButtonStyle(
                                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(

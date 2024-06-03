@@ -54,5 +54,4 @@ class CartItem {
       'imageUrl': imageUrl,
     };
   }
-
 }

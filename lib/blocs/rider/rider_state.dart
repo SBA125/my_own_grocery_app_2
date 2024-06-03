@@ -35,3 +35,21 @@ class RiderError extends RiderState {
   List<Object> get props => [message];
 }
 
+class OrderAccepted extends RiderState {
+  final Order order;
+
+  const OrderAccepted(this.order);
+
+  @override
+  List<Object> get props => [order];
+}
+
+class OrderCompleted extends RiderState {
+  final Order order;
+
+  const OrderCompleted(this.order);
+
+  @override
+  List<Object> get props => [order];
+}
+

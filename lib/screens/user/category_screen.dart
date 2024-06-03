@@ -16,21 +16,26 @@ class CategoryList extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (state is CategoriesLoaded) {
           final categories = state.categories;
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.8,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 15,
-            ),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              return InkWell(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>  ProductScreen(category: category))),
+          return Expanded(
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.8,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 15,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return InkWell(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ProductScreen(category: category))
+                  ),
                   child: CategoryCard(category: category),
-              );
-            },
+                );
+              },
+            ),
           );
         } else if (state is CategoryError) {
           return Center(child: Text(state.message));
@@ -62,7 +67,6 @@ class CategoryCard extends StatelessWidget {
               child: Image.network(
                 category.imageUrl,
                 fit: BoxFit.cover,
-                // width: double.infinity,
               ),
             ),
           ),
@@ -79,3 +83,4 @@ class CategoryCard extends StatelessWidget {
     );
   }
 }
+

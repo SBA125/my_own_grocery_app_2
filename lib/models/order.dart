@@ -29,6 +29,22 @@ class Order {
     required this.isReview,
   });
 
+  Order copyWith({String? status, bool? isReview}) {
+    return Order(
+      id: id,
+      items: items,
+      total: total,
+      createdAt: createdAt,
+      paymentMethod: paymentMethod,
+      userId: userId,
+      userName: userName,
+      contactNo: contactNo,
+      address: address,
+      status: status ?? this.status,
+      isReview: isReview ?? this.isReview,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

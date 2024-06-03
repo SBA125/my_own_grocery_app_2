@@ -38,7 +38,6 @@ class FirebaseAuthService {
       );
       return userCredential.user;
     } catch (e) {
-      // Handle sign-in errors
       print('Sign-in error: $e');
       return null;
     }
@@ -51,11 +50,9 @@ class FirebaseAuthService {
         password: password,
       );
 
-      // Update the user's display name with the provided username
       await userCredential.user?.updateDisplayName(username);
-      await userCredential.user?.reload(); // Refresh the user's profile
+      await userCredential.user?.reload();
 
-      // Save user details to Firestore
       await _firestore.collection('Users').doc('allUsers').update({
         'usersList': FieldValue.arrayUnion([
           {
@@ -69,7 +66,6 @@ class FirebaseAuthService {
 
       return userCredential.user;
     } catch (e) {
-      // Handle sign-up errors
       print('Sign-up error: $e');
       return null;
     }
@@ -81,7 +77,6 @@ class FirebaseAuthService {
       await _auth.signOut();
       await _googleSignIn.signOut();
     } catch (e) {
-      // Handle sign-out errors
       print('Sign-out error: $e');
     }
   }

@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:my_own_grocery_app_2/repositories/authentication_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
 import 'package:my_own_grocery_app_2/screens/admin/admin_category_screen.dart';
 import 'package:my_own_grocery_app_2/screens/admin/admin_order_screen.dart';
 import 'package:my_own_grocery_app_2/screens/admin/admin_product_screen.dart';
 import 'package:my_own_grocery_app_2/screens/admin/admin_rider_screen.dart';
 import 'package:my_own_grocery_app_2/screens/admin/admin_user_screen.dart';
+import 'package:my_own_grocery_app_2/screens/user/order_review_screen.dart';
+import 'package:my_own_grocery_app_2/widgets/admin_rider_side_drawer.dart';
 import '../../models/admin_card.dart';
 import '../../widgets/admin_card.dart';
 
 class AdminMainScreen extends StatelessWidget {
-  const AdminMainScreen({super.key});
+  final AuthenticationRepository authenticationRepository;
+  final UserRepository userRepository;
+  const AdminMainScreen({super.key, required this.authenticationRepository, required this.userRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -53,18 +59,24 @@ class AdminMainScreen extends StatelessWidget {
           MaterialPageRoute(builder: (context) => const AdminCategoryScreen()),
         ),
       ),
-      AdminCard(
-        title: 'Reviews',
-        icon: Icons.rate_review,
-        onTap: (context) => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const PlaceholderScreen(title: 'Reviews')),
-        ),
-      ),
+      // AdminCard(
+      //   title: 'Reviews',
+      //   icon: Icons.rate_review,
+      //   onTap: (context) => Navigator.push(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => const AddReviewScreen(orderID: orderID, orderRepository: orderRepository, authenticationRepository: authenticationRepository, userRepository: userRepository) ),
+      //   ),
+      // ),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Dashboard')),
+      drawer: AdminRiderSideDrawer(authenticationRepository: authenticationRepository, userRepository: userRepository),
+      appBar: AppBar(
+        title: const Text('Admin Dashboard'),
+        leading: Builder(
+          builder: (context) => IconButton(onPressed: () => Scaffold.of(context).openDrawer(), icon: const Icon(Icons.menu)),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -91,21 +103,3 @@ class AdminMainScreen extends StatelessWidget {
   }
 }
 
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-
-  const PlaceholderScreen({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Text(
-          'Placeholder for $title Screen',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-    );
-  }
-}

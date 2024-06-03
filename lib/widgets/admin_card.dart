@@ -21,7 +21,7 @@ class AdminCardWidget extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               card.title,
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ],
         ),

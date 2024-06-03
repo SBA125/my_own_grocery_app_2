@@ -23,8 +23,8 @@ class AdminOrderScreen extends StatelessWidget {
             return GridView.builder(
               padding: const EdgeInsets.all(16.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1, // Adjust the number of columns as needed
-                childAspectRatio: 0.7, // Adjust the aspect ratio as needed
+                crossAxisCount: 1,
+                childAspectRatio: 0.7,
                 crossAxisSpacing: 5.0,
                 mainAxisSpacing: 10.0,
               ),

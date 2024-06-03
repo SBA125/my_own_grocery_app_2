@@ -3,12 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import '../models/user.dart';
 
 class FirebaseUserService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore firestore;
+  final auth.FirebaseAuth firebaseAuth;
+
+  FirebaseUserService({
+    required this.firestore,
+    required this.firebaseAuth,
+  });
 
   Future<void> addUserToDatabase(User user) async {
     try {
-      await _firestore.runTransaction((transaction) async {
-        final allUsersDoc = _firestore.collection('Users').doc('allUsers');
+      await firestore.runTransaction((transaction) async {
+        final allUsersDoc = firestore.collection('Users').doc('allUsers');
 
         // Ensure the 'allUsers' document exists
         final docSnapshot = await transaction.get(allUsersDoc);
@@ -16,19 +22,15 @@ class FirebaseUserService {
           await transaction.set(allUsersDoc, {'usersList': []});
         }
 
-        // Retrieve the current 'usersList' array from the document
         final List<dynamic> usersList = docSnapshot.data()?['usersList'] ?? [];
 
-        // Append the user information to the 'usersList' array
         usersList.add({
           'userID': user.userID,
           'email': user.email,
           'username': user.username,
-          'role': 'user'
-          // Add other user fields if necessary
+          'role': 'user',
         });
 
-        // Update the document with the modified 'usersList'
         transaction.update(allUsersDoc, {'usersList': usersList});
       });
     } catch (e) {
@@ -37,7 +39,7 @@ class FirebaseUserService {
   }
 
   Future<String> getUserRole(String userID) async {
-    final doc = await _firestore.collection('Users').doc('allUsers').get();
+    final doc = await firestore.collection('Users').doc('allUsers').get();
     if (doc.exists) {
       final usersList = doc.data()?['usersList'] ?? [];
       final userData = usersList.firstWhere((user) => user['userID'] == userID, orElse: () => null);
@@ -51,16 +53,15 @@ class FirebaseUserService {
     }
   }
 
-  Future<User> displayUserDetails() async{
-    final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
-    final auth.User? currentUser = _auth.currentUser;
+  Future<User> displayUserDetails() async {
+    final currentUser = firebaseAuth.currentUser;
 
     if (currentUser != null) {
-      final DocumentSnapshot userDocSnapshot = await _firestore.collection('Users').doc('allUsers').get();
+      final userDocSnapshot = await firestore.collection('Users').doc('allUsers').get();
 
       if (userDocSnapshot.exists) {
-        final Map<String, dynamic>? userDataMap = userDocSnapshot.data() as Map<String, dynamic>?; // Cast to Map<String, dynamic>?
-        final List<dynamic> usersList = userDataMap?['usersList'] ?? [];
+        final userDataMap = userDocSnapshot.data() as Map<String, dynamic>?;
+        final usersList = userDataMap?['usersList'] ?? [];
         final userData = usersList.firstWhere((user) => user['userID'] == currentUser.uid, orElse: () => null);
 
         if (userData != null) {
@@ -87,5 +88,3 @@ class FirebaseUserService {
     throw Exception('No user is currently authenticated or user details not found');
   }
 }
-
-

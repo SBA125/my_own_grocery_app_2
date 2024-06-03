@@ -11,11 +11,11 @@ class FirebaseProductService {
     try {
       DocumentSnapshot doc = await _firestore.collection('Products ').doc('allProducts').get();
       if (doc.exists) {
-        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // Cast data to Map
+        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
         if (data != null && data.containsKey('productsList')) {
-          List<dynamic>? productsList = data['productsList'] as List<dynamic>?; // Cast categoriesList to List<dynamic>
+          List<dynamic>? productsList = data['productsList'] as List<dynamic>?;
           if (productsList != null) {
-            return productsList.map((e) => Product.fromMap(e as Map<String, dynamic>)).toList(); // Cast each element to Map<String, dynamic>
+            return productsList.map((e) => Product.fromMap(e as Map<String, dynamic>)).toList();
           } else {
             throw Exception('productsList is null');
           }

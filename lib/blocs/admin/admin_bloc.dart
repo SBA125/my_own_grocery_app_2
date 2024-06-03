@@ -56,7 +56,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     emit(AdminLoading());
     try {
       await adminRepository.updateProductDetails(event.productId, event.product);
-      emit(AdminSuccess());
+      final products = await adminRepository.getAllProducts();
+      emit(AdminLoadedProducts(products));
     } catch (e) {
       emit(AdminFailure(e.toString()));
     }

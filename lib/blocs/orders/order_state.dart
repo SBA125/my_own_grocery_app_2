@@ -51,3 +51,13 @@ class OrderHistoryError extends OrderState {
   @override
   List<Object> get props => [message];
 }
+
+class OrderStatusChanged extends OrderState {
+  final Order order;
+
+  const OrderStatusChanged(this.order);
+
+  @override
+  List<Object> get props => [order];
+}
+

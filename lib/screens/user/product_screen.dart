@@ -65,7 +65,7 @@ class ProductList extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.8,
+              childAspectRatio: 0.7,
               crossAxisSpacing: 10,
               mainAxisSpacing: 15,
             ),
@@ -113,7 +113,7 @@ class ProductCard extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  product.name,
+                  '${product.name} (${product.description})',
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),

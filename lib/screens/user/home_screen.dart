@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_own_grocery_app_2/blocs/authentication/authentication_event.dart';
 import 'package:my_own_grocery_app_2/repositories/authentication_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/order_repository.dart';
+import 'package:my_own_grocery_app_2/repositories/product_repository.dart';
 import 'package:my_own_grocery_app_2/repositories/user_repository.dart';
 import 'package:my_own_grocery_app_2/screens/user/cart_screen.dart';
 import 'package:my_own_grocery_app_2/widgets/side_drawer.dart';
@@ -12,10 +12,9 @@ import '../../blocs/authentication/authentication_state.dart';
 import '../../blocs/cart/cart_bloc.dart';
 import '../../blocs/cart/cart_event.dart';
 import '../../blocs/cart/cart_state.dart';
-import '../../blocs/categories/category_bloc.dart';
-import '../../blocs/categories/category_state.dart';
+import '../../blocs/products/product_bloc.dart';
 import '../../main.dart';
-import '../../models/category.dart';
+import '../../services/firebase_product_service.dart';
 import 'category_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -27,37 +26,14 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ProductRepository productRepository = ProductRepository(firebaseProductService: FirebaseProductService());
     return Scaffold(
       appBar: AppBar(
         leading: Builder(
           builder: (context) => IconButton(onPressed: () => Scaffold.of(context).openDrawer(), icon: const Icon(Icons.menu)),
         ),
         centerTitle: true,
-        title: Column(
-          children: [
-            Text(
-              'Pickup',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge!
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Location 1',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.arrow_drop_down),
-              ],
-            ),
-          ],
-        ),
+        title: const Text('Grocery App'),
         actions: [
           BlocBuilder<CartBloc, CartState>(
             builder: (context, state) {
@@ -70,8 +46,8 @@ class HomeScreen extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) =>  CartScreen(
-                      authenticationRepository: authenticationRepository, 
-                      userRepository: userRepository, 
+                      authenticationRepository: authenticationRepository,
+                      userRepository: userRepository,
                       orderRepository: orderRepository,
                     )
                     ),
@@ -79,17 +55,17 @@ class HomeScreen extends StatelessWidget {
                 },
                 icon: Badge(
                   isLabelVisible: itemCount > 0,
-                  label: Text(itemCount.toString()), // Display actual number in cart
+                  label: Text(itemCount.toString()),
                   child: const Icon(Icons.shopping_cart),
                 ),
               );
             },
           ),
         ],
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(60),
-          child: SearchTextFormField(),
-        ),
+        // bottom: const PreferredSize(
+        //   preferredSize: Size.fromHeight(60),
+        //   child: SearchTextFormField(),
+        // ),
       ),
       drawer: SideDrawer(authenticationRepository: authenticationRepository, userRepository: userRepository, orderRepository: orderRepository,),
       body: MultiBlocProvider(
@@ -100,6 +76,9 @@ class HomeScreen extends StatelessWidget {
           BlocProvider<CartBloc>(
             create: (_) => CartBloc()..add(LoadCart()),
           ),
+          BlocProvider<ProductBloc>(
+              create: (_) => ProductBloc(productRepository: productRepository),
+          )
         ],
         child: Container(
           decoration: const BoxDecoration(

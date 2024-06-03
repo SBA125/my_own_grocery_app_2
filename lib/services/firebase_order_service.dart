@@ -42,6 +42,9 @@ class OrderService {
     }
   }
 
+  Future<void> updateOrderStatus(String orderID, Map<String, dynamic> updatedOrder) async {
+    await _firestore.collection("Orders").doc(orderID).update(updatedOrder);
+  }
+
 }
 
-// Other service methods like updateOrder, deleteOrder, etc.
